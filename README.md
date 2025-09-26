@@ -38,6 +38,7 @@ pages = loader.load()
 len(pages)
 
 page = pages[1]
+<img width="928" height="405" alt="Screenshot 2025-09-26 112050" src="https://github.com/user-attachments/assets/8d5d4b56-a97c-4778-91b5-9dae5a33b22d" />
 
 print(page.page_content[0:500])
 
@@ -45,7 +46,7 @@ page.metadata
 ```
 
 ### OUTPUT:
-![Uploading image.png…]()
+<img width="928" height="405" alt="Screenshot 2025-09-26 112050" src="https://github.com/user-attachments/assets/c1027cc3-14c7-4670-9edc-9ddfbaab5a00" />
 
 
 ### RESULT:
