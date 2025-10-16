@@ -22,32 +22,41 @@ Question-Answering Chain Construction, Finally, we construct a Retrieval-Augment
 
 ### PROGRAM:
 ```
-import os
-import openai
-import sys
-sys.path.append('../..')
-
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv()) # read local .env file
-
-openai.api_key  = os.environ['OPENAI_API_KEY']
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain.vectorstores import DocArrayInMemorySearch
+from langchain.document_loaders import TextLoader
+from langchain.chains import RetrievalQA,  ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+from langchain.chat_models import ChatOpenAI
+from langchain.document_loaders import TextLoader
 from langchain.document_loaders import PyPDFLoader
-loader = PyPDFLoader("Ex-2.pdf")
-pages = loader.load()
 
-len(pages)
-
-page = pages[1]
-<img width="928" height="405" alt="Screenshot 2025-09-26 112050" src="https://github.com/user-attachments/assets/8d5d4b56-a97c-4778-91b5-9dae5a33b22d" />
-
-print(page.page_content[0:500])
-
-page.metadata
+def load_db(file, chain_type, k):
+    # load documents
+    loader = PyPDFLoader(file)
+    documents = loader.load()
+    # split documents
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    docs = text_splitter.split_documents(documents)
+    # define embedding
+    embeddings = OpenAIEmbeddings()
+    # create vector database from data
+    db = DocArrayInMemorySearch.from_documents(docs, embeddings)
+    # define retriever
+    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": k})
+    # create a chatbot chain. Memory is managed externally.
+    qa = ConversationalRetrievalChain.from_llm(
+        llm=ChatOpenAI(model_name=llm_name, temperature=0), 
+        chain_type=chain_type, 
+        retriever=retriever, 
+        return_source_documents=True,
+        return_generated_question=True,
+    )
+    return qa 
 ```
-
 ### OUTPUT:
-<img width="928" height="405" alt="Screenshot 2025-09-26 112050" src="https://github.com/user-attachments/assets/c1027cc3-14c7-4670-9edc-9ddfbaab5a00" />
-
+<img width="912" height="503" alt="image" src="https://github.com/user-attachments/assets/7dba6b3a-79c1-4a25-aeeb-76e9691522d7" />
 
 ### RESULT:
 The question-answering chatbot was successfully designed and implemented using the LangChain framework.
